@@ -1,32 +1,33 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
+import os
 
 db = SQLAlchemy()
 
-def create_app(config_object=None):
+def create_app():
     app = Flask(__name__)
 
     # Par défaut : modifier si nécessaire (ne pas hardcoder en production)
-    app.config.setdefault(
-        'SQLALCHEMY_DATABASE_URI',
-        'postgresql://realestate:password123@db:5432/real_estate_db'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
+        'DATABASE_URL',
+        'postgresql://realestate:password123@localhost:5432/real_estate_db'
     )
-    app.config.setdefault('SQLALCHEMY_TRACK_MODIFICATIONS', False)
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 
-    if config_object:
-        app.config.from_object(config_object)
 
     db.init_app(app)
-
-    from . import models 
-
     api = Api(app)
 
-    from .routes.users import Users
-    api.add_resource(Users, '/users')
+    from app.models import User 
 
-    # route de test
+    from app.routes.users import UsersListResource, UserResource, UserLoginResource
+    api.add_resource(UsersListResource, '/users')
+    api.add_resource(UserResource, '/users/<int:user_id>')
+    api.add_resource(UserLoginResource, '/users/login')
+
+    #route de test
     @app.route('/')
     def home():
         return {
