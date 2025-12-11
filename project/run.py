@@ -1,4 +1,7 @@
-from app import create_app, db
+from app import create_app
+from app.common.database import db
+print("📦 Importing in run.py")
+print(f"📦 db object id: {id(db)}") 
 
 app = create_app()
 

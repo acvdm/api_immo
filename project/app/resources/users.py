@@ -1,15 +1,8 @@
-from flask import request
-from flask_restful import Resource, Api, reqparse
-from app import db
-from app.models import User
+from flask_restful import Resource
+from app.common.database import db
+from app.models import User, Property
 from datetime import datetime
- 
-
-parser = reqparse.RequestParser()
-parser.add_argument('email', type=str, required=True, help='Email is required')
-parser.add_argument('last_name', type=str, required=True, help='Last name is required')
-parser.add_argument('first_name', type=str, required=True, help='First name is required')
-parser.add_argument('birth_date', type=str, required=True, help='Birth date is required (YYYY-MM-DD)')
+from app.common.parsers import get_user_create_parser, get_user_update_parser, get_user_login_parser
 
 
 class UsersListResource(Resource):
@@ -22,7 +15,11 @@ class UsersListResource(Resource):
 
     # Créer un nouvel utilisateur
     def post(self):
-        args = parser.parse_args()
+        # reqparse() retourne un dictionnaire 
+        # Calling parse_args with strict=True ensures that an error is thrown 
+        # if the request includes arguments your parser does not define.
+        parser = get_user_create_parser()
+        args = parser.parse_args(strict=True)
 
         # Vérifier si l'email existe déjà
         if User.query.filter_by(email=args['email']).first():
@@ -58,12 +55,8 @@ class UserResource(Resource):
     def patch(self, user_id):
         user = User.query.get_or_404(user_id)
 
-        parser = reqparse.RequestParser()
-        parser.add_argument('email')
-        parser.add_argument('last_name')
-        parser.add_argument('first_name')
-        parser.add_argument('birth_date')
-        args = parser.parse_args()
+        parser = get_user_update_parser()
+        args = parser.parse_args(strict=True)
 
         if args['email']: 
             user.email = args['email']
@@ -75,16 +68,25 @@ class UserResource(Resource):
             user.birth_date = datetime.strptime(args['birth_date'], '%Y-%m-%d').date()
 
         db.session.commit()
+
         return user.to_dict(), 200
 
 # lister les biens d'un utilisateur. GET /users/{id}/properties
+class UserPropertiesResource(Resource):
+    def get(self, user_id):
+        User.query.get_or_404(user_id)
+
+        query = Property.query.filter(Property.owner_id == user_id)
+        properties = query.all()
+        return {
+            "properties": [property.to_dict() for property in properties]
+        }, 200
 
 # authentification du user. POST /users/login 
-# Renvoie le user_id qui devra ensuite être mis dans X-User-Id: {user_id} pour toutes les requêtes avce ownership
+# Renvoie le user_id qui devra ensuite être mis dans X-User-Id: {user_id} pour toutes les requêtes avec ownership
 class UserLoginResource(Resource):
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('email', required=True, help='Email is required')
+        parser = get_user_login_parser()
         args = parser.parse_args()
 
         user = User.query.filter_by(email=args['email']).first()

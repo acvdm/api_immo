@@ -43,7 +43,7 @@ Solution:
 
 - Fonctionnalités détaillées:
   - User management (must-have):  
-  Attributs: id, email (unique), last_name, first_name, birth_date.  
+  Attributs: id, email (unique), last_name, first_name, birth_date, created_at.  
     - créer un utilisateur. `POST /users`
     - lister les infos personnelles d'un utilisateur. `GET /users/{id}`
     - lister tous les utilisateur de la plateforme. `GET /users` 
@@ -52,7 +52,7 @@ Solution:
     - authentification du user. `POST /users/login`  
     
   - Property management (must-have):  
-  Attributs: id, owner_id, name, description, type, city, price (integer), size (m2).  
+  Attributs: id, owner_id, name, description, type, city, price (integer), size (m2), created_at.  
     - créer un bien. `POST /properties` user_id requis,
     - lister tous les biens de la plateforme. `GET /properties`
     - lister les caractéristiques d'un bien. `GET /properties/{id}`
@@ -60,8 +60,8 @@ Solution:
     - modifier les caractéristiques d'un bien. `PATCH /properties/{id} avec` ownership check,
     - supprimer un bien. `DELETE /properties/{id}` avec ownership check.  
    
-  - Room management:  
-  Attributs: id, property_id, type (bedroom/kitchen/etc.), size (m2)  
+  - Room management (must-have):  
+  Attributs: id, property_id, type (bedroom/kitchen/etc.), size (m2), created_at  
     - créer une pièce. `POST /properties/{property_id}/rooms`
     - lister les pièces d'un bien. `GET /properties/{property_id}/rooms`
     - lister les caractéristiques d'une pièce spécifique. `GET /rooms/{id}`
@@ -112,7 +112,7 @@ Done means:
 1. Un utilisateur peut s'inscrire,
 2. Un utilisateur peut se connecter,
 3. Un utilisateur peut créer un bien,
-4. Un utilisateur peut modifier / ajouter des pièces à sont bien, 
+4. Un utilisateur peut modifier / ajouter des pièces à son bien, 
 5. Un utilisateur peut renseigner / modifier ses infos personnelles,
 6. GET /properties?city=Paris retourne uniquement les biens parisiens,
 7. Un utilisateur ne peut pas modifier le bien d'un autre utilisateur (403 Forbiden),
