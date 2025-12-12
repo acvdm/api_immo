@@ -1,6 +1,6 @@
 from app.common.database import db
+from sqlalchemy import func
 from sqlalchemy.orm import relationship
-from datetime import datetime
 
 
 # Attributs User: id, email (unique), last_name, first_name, birth_date.  
@@ -12,9 +12,10 @@ class User(db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     first_name = db.Column(db.String(100), nullable=False)
     birth_date = db.Column(db.Date, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=func.now())
 
     # un user possède plusieurs properties
+    # lazy = true ne charge pas automatiquement les biens qui sont liées au user quand on fait une requete
     properties = relationship("Property", back_populates="owner", lazy=True)
 
     def to_dict(self):
@@ -40,9 +41,10 @@ class Property(db.Model):
     city = db.Column(db.String(100), nullable=False)
     price = db.Column(db.Integer, nullable=True)
     size = db.Column(db.Integer, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=func.now())
 
     owner = relationship("User", back_populates="properties")
+    rooms = relationship("Room", back_populates="parent_property", lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -53,6 +55,27 @@ class Property(db.Model):
             'type': self.type,
             'city': self.city,
             'price': self.price,
+            'size': self.size,
+            'created_at': self.created_at.isoformat()
+        }
+    
+# Attributs: id, property_id, type (bedroom/kitchen/etc.), size (m2)  
+class Room(db.Model):
+    __tablename__ = 'rooms'
+
+    id = db.Column(db.Integer, primary_key=True)
+    property_id = db.Column(db.Integer, db.ForeignKey('properties.id'), nullable=False)
+    type = db.Column(db.String(100), nullable=False)
+    size = db.Column(db.Integer, nullable=True)
+    created_at = db.Column(db.DateTime, default=func.now())
+
+    parent_property = relationship("Property", back_populates="rooms")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'property_id': self.property_id,
+            'type': self.type,
             'size': self.size,
             'created_at': self.created_at.isoformat()
         }

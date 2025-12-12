@@ -48,3 +48,16 @@ def get_property_update_parser():
     return parser
 
 
+# --- ROOMS ---
+def get_room_create_parser():
+    parser = reqparse.RequestParser()
+    parser.add_argument('property_id', type=int, required=True, help='Property_id is required')
+    parser.add_argument('type', type=str, required=True, help='Type is required')
+    parser.add_argument('size', type=int, required=True, help='size is required')
+    return parser
+
+def get_room_update_parser():
+    parser = reqparse.RequestParser()
+    parser.add_argument('type', type=str, required=False)
+    parser.add_argument('size', type=int, required=False)
+    return parser

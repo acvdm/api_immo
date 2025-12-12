@@ -23,8 +23,9 @@ def create_app():
 
     # Import et enregistrement des ressources
     from app.resources.users import UsersListResource, UserResource, UserPropertiesResource, UserLoginResource
-    from app.resources.properties import PropertiesListResource, PropertyResource
-    
+    from app.resources.properties import PropertiesListResource, PropertyResource, PropertyRoomsResource
+    from app.resources.rooms import RoomsListResource, RoomResource
+
     # routes
     api.add_resource(UsersListResource, '/users')
     api.add_resource(UserResource, '/users/<int:user_id>')
@@ -33,6 +34,10 @@ def create_app():
 
     api.add_resource(PropertiesListResource, '/properties')
     api.add_resource(PropertyResource, '/properties/<int:property_id>')
+    api.add_resource(PropertyRoomsResource, '/properties/<int:property_id>/rooms')
+
+    api.add_resource(RoomsListResource, '/rooms')
+    api.add_resource(RoomResource, '/rooms/<int:room_id>')
 
     # route de test
     @app.route('/')
@@ -42,6 +47,8 @@ def create_app():
             'status': 'running',
             'endpoints': {
                 'users': '/users',
+                'properties': '/properties',
+                'rooms': '/rooms'
             }
         }
 

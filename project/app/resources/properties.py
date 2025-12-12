@@ -1,8 +1,7 @@
 from flask_restful import Resource
 from flask import request
 from app.common.database import db
-from app.models import Property
-from datetime import datetime
+from app.models import Property, Room
 from app.common.parsers import get_property_create_parser, get_property_update_parser
 
 
@@ -54,7 +53,6 @@ class PropertyResource(Resource):
     # modifier les caractéristiques d'un bien. `PATCH /properties/{id} avec` ownership check, TODO
     def patch(self, property_id):
         property = Property.query.get_or_404(property_id)
-        print("property_id ${property_id}")
 
         parser = get_property_update_parser()
         args = parser.parse_args(strict=True)
@@ -75,6 +73,17 @@ class PropertyResource(Resource):
         db.session.commit()
 
         return property.to_dict(), 200
+
+# lister les rooms d'une property. GET /properties/{id}/rooms
+class PropertyRoomsResource(Resource):
+    def get(self, property_id):
+        Property.query.get_or_404(property_id)
+
+        query = Room.query.filter(Room.property_id == property_id)
+        Rooms = query.all()
+        return {
+            "properties": [room.to_dict() for room in Rooms]
+        }, 200
 
 
 # supprimer un bien. `DELETE /properties/{id}` avec ownership check.
