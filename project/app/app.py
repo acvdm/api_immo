@@ -6,16 +6,14 @@ from app.common.database import db
 def create_app():
     app = Flask(__name__)
 
-    # Par défaut : modifier si nécessaire (ne pas hardcoder en production)
+    # Connexion à PostgreSQL
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv(
         'DATABASE_URL',
         'postgresql://realestate:password123@localhost:5432/real_estate_db'
     )
+
+    # Bonne pratique, evite les warnings
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-
-    app.config['SQLALCHEMY_ECHO'] = True
-
 
     db.init_app(app)
     api = Api(app)
@@ -24,7 +22,7 @@ def create_app():
     # Import et enregistrement des ressources
     from app.resources.users import UsersListResource, UserResource, UserPropertiesResource, UserLoginResource
     from app.resources.properties import PropertiesListResource, PropertyResource, PropertyRoomsResource
-    from app.resources.rooms import RoomsListResource, RoomResource
+    from app.resources.rooms import RoomResource
 
     # routes
     api.add_resource(UsersListResource, '/users')
@@ -36,7 +34,6 @@ def create_app():
     api.add_resource(PropertyResource, '/properties/<int:property_id>')
     api.add_resource(PropertyRoomsResource, '/properties/<int:property_id>/rooms')
 
-    api.add_resource(RoomsListResource, '/rooms')
     api.add_resource(RoomResource, '/rooms/<int:room_id>')
 
     # route de test

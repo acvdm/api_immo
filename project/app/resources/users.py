@@ -3,6 +3,7 @@ from app.common.database import db
 from app.models import User, Property
 from datetime import datetime
 from app.common.parsers import get_user_create_parser, get_user_update_parser, get_user_login_parser
+from app.common.auth import get_current_user_id
 
 
 class UsersListResource(Resource):
@@ -15,13 +16,9 @@ class UsersListResource(Resource):
 
     # Créer un nouvel utilisateur
     def post(self):
-        # reqparse() retourne un dictionnaire 
-        # Calling parse_args with strict=True ensures that an error is thrown 
-        # if the request includes arguments your parser does not define.
         parser = get_user_create_parser()
         args = parser.parse_args(strict=True)
 
-        # Vérifier si l'email existe déjà
         if User.query.filter_by(email=args['email']).first():
             return {
                 'error': 'Email already exists'
@@ -29,7 +26,6 @@ class UsersListResource(Resource):
 
         birth_date = datetime.strptime(args['birth_date'], '%Y-%m-%d').date()
 
-        # Créer l'utilisateur
         new_user = User(
             email=args['email'],
             last_name=args['last_name'],
@@ -46,13 +42,19 @@ class UsersListResource(Resource):
         }, 201
 
 
-# lister les infos personnelles d'un utilisateur. GET /users/{id}
 class UserResource(Resource):
     def get(self, user_id):
         user = User.query.get_or_404(user_id)
         return user.to_dict(), 200
     
     def patch(self, user_id):
+        user_id_req = get_current_user_id()
+        if user_id_req is None:
+            return {'error': 'X-User-Id is required'}, 401
+        
+        if user_id_req != user_id:
+            return {'error': 'Forbidden'}, 403
+        
         user = User.query.get_or_404(user_id)
 
         parser = get_user_update_parser()
@@ -71,6 +73,7 @@ class UserResource(Resource):
 
         return user.to_dict(), 200
 
+
 # lister les biens d'un utilisateur. GET /users/{id}/properties
 class UserPropertiesResource(Resource):
     def get(self, user_id):
@@ -81,6 +84,7 @@ class UserPropertiesResource(Resource):
         return {
             "properties": [property.to_dict() for property in properties]
         }, 200
+
 
 # authentification du user. POST /users/login 
 # Renvoie le user_id qui devra ensuite être mis dans X-User-Id: {user_id} pour toutes les requêtes avec ownership

@@ -1,53 +1,26 @@
-from app.models import Room
+from app.models import Room, Property
 from flask_restful import Resource
 from app.common.database import db
-from app.common.parsers import get_room_create_parser, get_room_update_parser
+from app.common.parsers import get_room_update_parser
+from app.common.auth import get_current_user_id
 
-# Attributs: id, property_id, type (bedroom/kitchen/etc.), size (m2)  
-# Listre l'ensemble des pieces
 
-# créer une pièce. `POST /properties/{property_id}/rooms`
-
-# lister les pièces d'un bien. `GET /properties/{property_id}/rooms`
-
-# lister les caractéristiques d'une pièce spécifique. `GET /rooms/{id}`
-
-# modifier les caractéristiques d'une pièce. `PATCH /rooms/{id}` avec ownership check,
-
-# supprimer une pièce. `DELETE /rooms/{id}` avec ownership check. 
-
-class RoomsListResource(Resource):
-    def get(self):
-        rooms = Room.query.all()
-        return {
-            'rooms': [room.to_dict() for room in rooms]
-        }, 200
-
-    def post(self):
-        parser = get_room_create_parser()
-        args = parser.parse_args(strict=True)
-
-        new_room = Room (
-            property_id = args['property_id'],
-            type = args['type'],
-            size = args['size']
-        )
-
-        db.session.add(new_room)
-        db.session.commit()
-
-        return {
-            'message': 'Room created successfully',
-            'room': new_room.to_dict()
-        }, 201
-    
 class RoomResource(Resource):
     def get(self, room_id):
         room = Room.query.get_or_404(room_id)
         return room.to_dict(), 200
+
     
     def patch(self, room_id):
+        user_id = get_current_user_id()
+        if user_id is None:
+            return {'error': 'X-User-Id header is required'}, 401
+        
         room = Room.query.get_or_404(room_id)
+
+        property = Property.query.get_or_404(room.property_id)
+        if property.owner_id != user_id:
+            return {'error': 'Forbidden'}, 403
 
         parser = get_room_update_parser()
         args = parser.parse_args(strict=True)
@@ -61,3 +34,19 @@ class RoomResource(Resource):
         db.session.commit()
 
         return room.to_dict(), 200
+    
+    def delete(self, room_id):
+        user_id = get_current_user_id()
+        if user_id is None:
+            return {'error': 'X-User-Id header is required'}, 401
+        
+        room = Room.query.get_or_404(room_id)
+
+        property = Property.query.get_or_404(room.property_id)
+        if property.owner_id != user_id:
+            return {'error': 'Forbidden'}, 403
+        
+        db.session.delete(room)
+        db.session.commit()
+
+        return '', 204
