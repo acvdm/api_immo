@@ -1,6 +1,6 @@
-PITCH - Microservice de gestion immobilière - Python/Flask
+# PITCH - Microservice de gestion immobilière - Python/Flask
 
-Problem:
+## Problem:
 Les utilisateurs d'une plateforme de gestion immobilière n'ont pas la possibilité de gérer 
 leurs biens de façon structurée.
 Nous voulons que les utilisateurs puissent:
@@ -11,18 +11,16 @@ Nous voulons que les utilisateurs puissent:
 Nous souhaterions si possible que:  
 Un propriétaire ne puisse modifier que les caractéristiques de son bien sans avoir accès à l'édition des autres biens.
 
-***
 
-Appetite:
+## Appetite:
 - Temps imparti pour ces fonctionnalités: 7 jours,
 - Taille de l'équipe: 1 développeur, 
 - Deadline: Mardi 16/12/2025,
 - Type de livrable: MVP fonctionnel
 
-***
 
-Solution:
-- Breadboard:
+## Solution:
+### Breadboard:
   1. `[User]` -> Créer un compte (`POST /users`)
   2. `[User]` -> Se connecter (`POST /users/login`)
   3. `[User]` -> Créer un bien (`POST /properties`)
@@ -30,7 +28,7 @@ Solution:
   5. `[User]` -> Afficher les biens (GET /properties?city=Paris)
   6. `[Owner]` -> Modifier seulement ses propres biens (ownership check → 403 si violation)  
 
-- Fat marker sketch:
+### Fat marker sketch:
     - Flask REST API
       - `/users` -> auth + CRUD
       - `/properties` -> CRUD + filter
@@ -41,7 +39,7 @@ Solution:
       - properties (N)
       - rooms (N)
 
-- Fonctionnalités détaillées:
+### Fonctionnalités détaillées:
   - User management (must-have):  
   Attributs: id, email (unique), last_name, first_name, birth_date, created_at.  
     - créer un utilisateur. `POST /users`
@@ -77,24 +75,21 @@ Solution:
     - Alternative si le temps le permet: JWT tokens 
     => property.owner_id == current_user_id avant toute action de PATCH/DELETE
 
-***
 
-Risques à éviter:
+## Risques à éviter:
 - authentification complexe: on ne fera qu'une authentification simulée avec header X-User-Id. Si le temps le permet JWT simple sans refresh
-- architecture trop complexe avec des Microservices: architecture monolithique en 2 conteneurs (DB et APP sans séparation des logiques métiers) 
+- architecture trop complexe avec des Microservices: architecture monolithique en 2 conteneurs (db et api sans séparation des logiques métiers) 
 - features non demandées: rester sur le scope, et implémenter des features utiles si le temps le permet
 - deletes en cascade complexes: cascade='all-delete-orphan'
 
-***
 
-No-Gos:
+## No-Gos:
   - Frontend
   - déploiement
 
-***
 
-Scopes:
-1. Must-have:
+## Scopes:
+### Must-have:
 - Scope 1 : User CRUD + login simple (1 j)
 - Scope 2 : Property CRUD (1 j)
 - Scope 3 : Room CRUD (1 j)
@@ -102,13 +97,12 @@ Scopes:
 - Scope 5 : README clair pour run local (0.5 j)
 - Scope 6 : Debug & ajustements (1 j)
 
-2. Nice-to-have:
+### Nice-to-have:
 - Scope 7 : ownership control (1j)
 - Scope 8 : tests unitaires (0.5j)
 
-***
 
-Done means:
+## Done means:
 1. Un utilisateur peut s'inscrire,
 2. Un utilisateur peut se connecter,
 3. Un utilisateur peut créer un bien,
@@ -119,12 +113,11 @@ Done means:
 8. l'API retourne des erreurs HTTP appropriées (400, 404, 403, 500)
 9. Le README permet de lancer le projet en 5 minutes
 
-***
 
-Stack technique:
-- Langage: Python (requis)
-- Framework: Flask (requis, adapté aux APIs REST),
-- Base de données: PostreSQL (Relationnel),
-- Eventuel ORM: SQLAlchemy (standard python, puissant pour les relations),
-- Tests: Pytest (standard python pour tests unitaires),
-- Auth: Header custom (simple pour un MVP, evolutif vers JWT)
+## Stack technique:
+- **Langage**: Python (requis)
+- **Framework**: Flask (requis, adapté aux APIs REST),
+- **Base de données**: PostreSQL (Relationnel),
+- **Eventuel ORM**: SQLAlchemy (standard python, puissant pour les relations),
+- **Tests**: Pytest (standard python pour tests unitaires),
+- **Auth**: Header custom (simple pour un MVP, evolutif vers JWT)
