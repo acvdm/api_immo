@@ -3,6 +3,7 @@ from flask_restful import Api
 import os
 from app.common.database import db
 
+
 def create_app():
     app = Flask(__name__)
 

@@ -6,15 +6,19 @@ from app.common.parsers import get_user_create_parser, get_user_update_parser, g
 from app.common.auth import get_current_user_id
 
 
+
+# =====================
+#   Endpoint : /users
+# =====================
+
 class UsersListResource(Resource):
-    # lister l'ensemble des utilisateurs
     def get(self):
         users = User.query.all()
         return {
             'users': [user.to_dict() for user in users]
         }, 200
 
-    # Créer un nouvel utilisateur
+
     def post(self):
         parser = get_user_create_parser()
         args = parser.parse_args(strict=True)
@@ -42,11 +46,17 @@ class UsersListResource(Resource):
         }, 201
 
 
+
+# ==========================
+#   Endpoint : /users/{id}
+# ==========================
+
 class UserResource(Resource):
     def get(self, user_id):
         user = User.query.get_or_404(user_id)
         return user.to_dict(), 200
     
+
     def patch(self, user_id):
         user_id_req = get_current_user_id()
         if user_id_req is None:
@@ -74,20 +84,28 @@ class UserResource(Resource):
         return user.to_dict(), 200
 
 
-# lister les biens d'un utilisateur. GET /users/{id}/properties
+
+# =====================================
+#   Endpoint : /users/{id}/properties
+# =====================================
+
 class UserPropertiesResource(Resource):
     def get(self, user_id):
         User.query.get_or_404(user_id)
 
         query = Property.query.filter(Property.owner_id == user_id)
         properties = query.all()
+
         return {
             "properties": [property.to_dict() for property in properties]
         }, 200
 
 
-# authentification du user. POST /users/login 
-# Renvoie le user_id qui devra ensuite être mis dans X-User-Id: {user_id} pour toutes les requêtes avec ownership
+
+# ==========================
+#   Endpoint : /users/login
+# ==========================
+
 class UserLoginResource(Resource):
     def post(self):
         parser = get_user_login_parser()

@@ -6,10 +6,13 @@ from app.common.parsers import get_property_create_parser, get_property_update_p
 from app.common.auth import get_current_user_id 
 
 
+
+# ==========================
+#   Endpoint : /properties
+# ==========================
+
 class PropertiesListResource(Resource):
-    # Lister tous les biens de la plateforme 
     def get(self):
-        
         city = request.args.get("city", None, type=str)
         print("city param:", repr(city))
         query = Property.query
@@ -18,12 +21,12 @@ class PropertiesListResource(Resource):
             query = query.filter_by(city=city)
 
         properties = query.all()
+
         return {
             'properties': [property.to_dict() for property in properties]
         }, 200
 
 
-    # créer un bien. `POST /properties` user_id requis
     def post(self):
         user_id = get_current_user_id()
         if user_id is None:
@@ -52,12 +55,16 @@ class PropertiesListResource(Resource):
 
 
 
+# ===============================
+#   Endpoint : /properties/{id}
+# ===============================
+
 class PropertyResource(Resource):
     def get(self, property_id):
         property = Property.query.get_or_404(property_id)
         return property.to_dict(), 200
-    
-    # modifier les caractéristiques d'un bien. `PATCH /properties/{id} avec` ownership check
+
+
     def patch(self, property_id):
         user_id = get_current_user_id()
         if user_id is None:
@@ -88,6 +95,7 @@ class PropertyResource(Resource):
 
         return property.to_dict(), 200
     
+
     def delete(self, property_id):
         user_id = get_current_user_id()
         if user_id is None:
@@ -105,18 +113,22 @@ class PropertyResource(Resource):
         
 
 
+# =====================================
+#   Endpoint : /properties/{id}/rooms
+# =====================================
 
-# lister les rooms d'une property. GET /properties/{id}/rooms
 class PropertyRoomsResource(Resource):
     def get(self, property_id):
         Property.query.get_or_404(property_id)
 
         query = Room.query.filter(Room.property_id == property_id)
         Rooms = query.all()
+
         return {
             "properties": [room.to_dict() for room in Rooms]
         }, 200
     
+
     def post(self, property_id):
         user_id = get_current_user_id()
         if user_id is None:
@@ -144,5 +156,3 @@ class PropertyRoomsResource(Resource):
             'room': new_room.to_dict()
         }, 201
 
-
-# supprimer un bien. `DELETE /properties/{id}` avec ownership check.

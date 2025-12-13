@@ -3,9 +3,10 @@ from sqlalchemy import func
 from sqlalchemy.orm import relationship
 
 
-# Attributs User: id, email (unique), last_name, first_name, birth_date.  
+
 class User(db.Model):
     __tablename__ = 'users'
+
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -16,6 +17,7 @@ class User(db.Model):
 
     # lazy = true ne charge pas automatiquement les biens qui sont liées au user quand on fait une requete
     properties = relationship("Property", back_populates="owner", lazy=True)
+
 
     def to_dict(self):
         return {
@@ -28,9 +30,10 @@ class User(db.Model):
         }
 
 
-# Attributs: id, owner_id, name, description, type, city, price (integer), size (m2). 
+
 class Property(db.Model):
     __tablename__ = 'properties'
+
 
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
@@ -45,6 +48,7 @@ class Property(db.Model):
     owner = relationship("User", back_populates="properties")
     rooms = relationship("Room", back_populates="parent_property", lazy=True, cascade="all, delete-orphan")
 
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -58,7 +62,8 @@ class Property(db.Model):
             'created_at': self.created_at.isoformat()
         }
     
-# Attributs: id, property_id, type (bedroom/kitchen/etc.), size (m2)  
+
+ 
 class Room(db.Model):
     __tablename__ = 'rooms'
 
@@ -69,6 +74,7 @@ class Room(db.Model):
     created_at = db.Column(db.DateTime, default=func.now())
 
     parent_property = relationship("Property", back_populates="rooms")
+
 
     def to_dict(self):
         return {

@@ -1,6 +1,7 @@
 from app import create_app
 from app.common.database import db
 
+print ("fichier run.py")
 app = create_app()
 
 if __name__ == '__main__':

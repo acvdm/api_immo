@@ -5,6 +5,11 @@ from app.common.parsers import get_room_update_parser
 from app.common.auth import get_current_user_id
 
 
+
+# =====================
+#   Endpoint : /rooms
+# =====================
+
 class RoomResource(Resource):
     def get(self, room_id):
         room = Room.query.get_or_404(room_id)
@@ -35,6 +40,7 @@ class RoomResource(Resource):
 
         return room.to_dict(), 200
     
+
     def delete(self, room_id):
         user_id = get_current_user_id()
         if user_id is None:
