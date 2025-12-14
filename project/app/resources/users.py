@@ -53,7 +53,9 @@ class UsersListResource(Resource):
 
 class UserResource(Resource):
     def get(self, user_id):
-        user = User.query.get_or_404(user_id)
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': f'User {user_id} not found'}, 404
         return user.to_dict(), 200
     
 
@@ -65,7 +67,9 @@ class UserResource(Resource):
         if user_id_req != user_id:
             return {'error': 'Forbidden'}, 403
         
-        user = User.query.get_or_404(user_id)
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': f'User {user_id} not found'}, 404
 
         parser = get_user_update_parser()
         args = parser.parse_args(strict=True)
@@ -91,13 +95,15 @@ class UserResource(Resource):
 
 class UserPropertiesResource(Resource):
     def get(self, user_id):
-        User.query.get_or_404(user_id)
+        user = User.query.get(user_id)
+        if not user:
+            return {'error': f'User {user_id} not found'}, 404
 
         query = Property.query.filter(Property.owner_id == user_id)
         properties = query.all()
 
         return {
-            "properties": [property.to_dict() for property in properties]
+            'properties': [property.to_dict() for property in properties]
         }, 200
 
 
@@ -119,5 +125,4 @@ class UserLoginResource(Resource):
         return {
             'message': 'Login successful',
             'user_id': user.id,
-            'user': user.to_dict()
         }, 200

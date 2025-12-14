@@ -2,12 +2,42 @@
 
 API REST en Python/Flask pour gérer des biens immobiliers, leurs pièces et les utilisateurs.
 
-## Démarrage
 
 ### Prérequis
-- Docker
-- Docker Compose
+Ce projet utilise Docker pour garantir un environnement d'exécution identique sur toutes les machines.
 
+
+#### Installation de Docker
+##### Windows et Mac
+1. Télécharger **Docker Desktop** : https://www.docker.com/products/docker-desktop/
+2. Installer l'application (suivre l'assistant d'installation)
+3. Lancez Docker Desktop et attendez qu'il affiche ¨Docker is running¨
+4. Vérifiez l'installation en ouvrant le terminal:
+```bash
+$ docker --version
+
+# Vérifier la version de Docker Compose
+$ docker compose version
+```
+
+##### Linux (Ubuntu/Debian)
+```bash
+# Installer Docker
+$ sudo apt-get update
+$ sudo apt-get install docker.io docker-compose-plugin
+
+# Ajouter votre utilisateur au groupe docker
+$ sudo usermod -aG docker $USER
+
+# Appliquer les changements immédiatement
+$ newgrp docker
+
+# Vérifier l'installation
+$ docker --version
+$ docker compose version
+```
+
+## Lancement du projet
 ### Installation
 ```bash
 # 1. Cloner le projet
@@ -15,23 +45,54 @@ $ git clone https://github.com/acvdm/api_immo.git api_immo
 $ cd api_immo/project
 
 # 2. Lancer les services (api et db)
-$ docker compose up --build
+$ docker compose up -d
 
-# 3. L'API est disponible sur http://localhost:5000
+# Vérifier que les conteneurs sont en cours d'exécution
+$ docker ps
+```
+
+L'API est disponible sur http://localhost:5000
+
+### Arrêter l'application
+```bash
+# Arrêter les conteneurs
+docker compose down
+
+# Réinitialisation complète
+docker compose down -v
+```
+
+### Résolution des problèmes
+#### Le port 5432 ou 5000 est déjà utilisé
+Modifier les ports dans `docker-compose.yml`:
+```yaml
+ports:
+  - "5433:5432" # PostgreSQL
+  - "5001:5000" # API
+```
+
+#### Erreur "Database does not exist"
+Réinitialiser les volumes
+```bash
+# Réinitialiser
+$ docker compose down -v
+
+# Relancer
+$ docker compose up -d
 ```
 
 ## Endpoints disponibles
 ### Users 
 - `POST /users` > Créer un utilisateur
-- `GET /users/{id}` > Lister les infos personnelles d'un utilisateur
 - `GET /users` > Lister tous les utilisateur de la plateforme
+- `GET /users/{id}` > Lister les infos personnelles d'un utilisateur
 - `PATCH /users/{id}` > Modifier ses infos personnelles (header `X-User-Id` requis)
-- `GET /users/{id}/properties` > Lister les biens d'un utilisateur
 - `POST /users/login` > Authentification d'un utilisateur
     
 ### Properties 
 - `POST /properties` > Créer un bien (header `X-User-Id` requis)
 - `GET /properties` > Lister tous les biens de la plateforme
+- `GET /users/{id}/properties` > Lister les biens d'un utilisateur
 - `GET /properties/{id}` > Lister les caractéristiques d'un bien
 - `GET /properties?city={city}` > Lister tous les biens avec un filtre par ville
 - `PATCH /properties/{id}` > Modifier les caractéristiques d'un bien (header `X-User-Id` requis)
@@ -43,18 +104,19 @@ $ docker compose up --build
 - `GET /rooms/{id}` > Lister les caractéristiques d'une pièce spécifique
 - `PATCH /rooms/{id}` > Modifier les caractéristiques d'une pièce (header `X-User-Id` requis),
 - `DELETE /rooms/{id}` > Supprimer une pièce (header `X-User-Id` requis)
+  
 
 ## Utilisation
 ### Authentification
 L'API utilise un sytème simple basé sur le header **'X-User-Id'** pour identifier l'utilisateur.
 Pour certains endpoints, ajoutez ce header (1 étant le user_id du propriétaire du bien, à adapter)
 ```bash
--H "X-User-Id: 1"
-```
-
+$ -H "X-User-Id: 1"
+```  
+  
 ### Créer un utilisateur
 ```bash
-curl -X POST http://localhost:5000/users \
+$ curl -X POST http://localhost:5000/users \
 -H "Content-Type: application/json" \
 -d '{    
     "email": "john@example.com",
@@ -66,7 +128,7 @@ curl -X POST http://localhost:5000/users \
 
 ### Modifier les informations personnelles d'un utilisateur - header **'X-User-Id'** requis
 ```bash
-curl -X PATCH http://localhost:5000/users/1 \
+$ curl -X PATCH http://localhost:5000/users/1 \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
@@ -76,7 +138,7 @@ curl -X PATCH http://localhost:5000/users/1 \
 
 ### Créer un bien - header **'X-User-Id'** requis
 ```bash
-curl -X POST http://localhost:5000/properties \
+$ curl -X POST http://localhost:5000/properties \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
@@ -91,12 +153,13 @@ curl -X POST http://localhost:5000/properties \
 
 ### Filtrer les biens par ville
 ```bash
-curl -X GET http://localhost:5000/properties?city=Clichy
+$ curl -X GET http://localhost:5000/properties?city=Clichy
 ```
 
 ### Ajouter une pièce à un bien - header **'X-User-Id'** requis
+#### 1 étant l'id du bien (à adapter)  
 ```bash
-curl -X POST http://localhost:5000/1/rooms \
+$ curl -X POST http://localhost:5000/properties/1/rooms \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{

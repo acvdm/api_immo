@@ -61,7 +61,9 @@ class PropertiesListResource(Resource):
 
 class PropertyResource(Resource):
     def get(self, property_id):
-        property = Property.query.get_or_404(property_id)
+        property = Property.query.get(property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
         return property.to_dict(), 200
 
 
@@ -70,7 +72,9 @@ class PropertyResource(Resource):
         if user_id is None:
             return {'error': 'X-User-Id header required'}, 401
 
-        property = Property.query.get_or_404(property_id)
+        property = Property.query.get(property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
 
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403
@@ -101,7 +105,9 @@ class PropertyResource(Resource):
         if user_id is None:
             return {'error': 'X-User-Id is required'}, 401
         
-        property = Property.query.get_or_404(property_id)
+        property = Property.query.get(property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
 
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403
@@ -119,13 +125,15 @@ class PropertyResource(Resource):
 
 class PropertyRoomsResource(Resource):
     def get(self, property_id):
-        Property.query.get_or_404(property_id)
+        property = Property.query.get(property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
 
         query = Room.query.filter(Room.property_id == property_id)
         Rooms = query.all()
 
         return {
-            "properties": [room.to_dict() for room in Rooms]
+            [room.to_dict() for room in Rooms]
         }, 200
     
 
@@ -134,7 +142,9 @@ class PropertyRoomsResource(Resource):
         if user_id is None:
             return {'error': 'X-User-Id header is required'}, 401
         
-        property = Property.query.get_or_404(property_id)
+        property = Property.query.get(property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
 
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403

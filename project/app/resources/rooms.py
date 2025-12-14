@@ -12,7 +12,9 @@ from app.common.auth import get_current_user_id
 
 class RoomResource(Resource):
     def get(self, room_id):
-        room = Room.query.get_or_404(room_id)
+        room = Room.query.get(room_id)
+        if not room:
+            return {'error': f'Room {room_id} not found'}, 404
         return room.to_dict(), 200
 
     
@@ -21,9 +23,14 @@ class RoomResource(Resource):
         if user_id is None:
             return {'error': 'X-User-Id header is required'}, 401
         
-        room = Room.query.get_or_404(room_id)
+        room = Room.query.get(room_id)
+        if not room:
+            return {'error': f'Room {room_id} not found'}, 404
 
-        property = Property.query.get_or_404(room.property_id)
+        property = Property.query.get(room.property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
+
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403
 
@@ -46,9 +53,14 @@ class RoomResource(Resource):
         if user_id is None:
             return {'error': 'X-User-Id header is required'}, 401
         
-        room = Room.query.get_or_404(room_id)
+        room = Room.query.get(room_id)
+        if not room:
+            return {'error': f'Room {room_id} not found'}, 404
 
-        property = Property.query.get_or_404(room.property_id)
+        property = Property.query.get(room.property_id)
+        if not property:
+            return {'error': f'Property {property_id} not found'}, 404
+
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403
         
