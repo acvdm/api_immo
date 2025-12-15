@@ -14,41 +14,41 @@ Ce projet utilise Docker pour garantir un environnement d'exécution identique s
 3. Lancez Docker Desktop et attendez qu'il affiche ¨Docker is running¨
 4. Vérifiez l'installation en ouvrant le terminal:
 ```bash
-$ docker --version
+docker --version
 
 # Vérifier la version de Docker Compose
-$ docker compose version
+docker compose version
 ```
 
 ##### Linux (Ubuntu/Debian)
 ```bash
 # Installer Docker
-$ sudo apt-get update
-$ sudo apt-get install docker.io docker-compose-plugin
+udo apt-get update
+sudo apt-get install docker.io docker-compose-plugin
 
 # Ajouter votre utilisateur au groupe docker
-$ sudo usermod -aG docker $USER
+sudo usermod -aG docker $USER
 
 # Appliquer les changements immédiatement
-$ newgrp docker
+newgrp docker
 
 # Vérifier l'installation
-$ docker --version
-$ docker compose version
+docker --version
+docker compose version
 ```
 
 ## Lancement du projet
 ### Installation
 ```bash
 # 1. Cloner le projet
-$ git clone https://github.com/acvdm/api_immo.git api_immo
-$ cd api_immo/project
+git clone https://github.com/acvdm/api_immo.git api_immo
+cd api_immo/project
 
 # 2. Lancer les services (api et db)
-$ docker compose up -d
+docker compose up -d
 
 # Vérifier que les conteneurs sont en cours d'exécution
-$ docker ps
+docker ps
 ```
 
 L'API est disponible sur http://localhost:5000
@@ -75,10 +75,10 @@ ports:
 Réinitialiser les volumes
 ```bash
 # Réinitialiser
-$ docker compose down -v
+docker compose down -v
 
 # Relancer
-$ docker compose up -d
+docker compose up -d
 ```
 
 ## Endpoints disponibles
@@ -111,12 +111,12 @@ $ docker compose up -d
 L'API utilise un sytème simple basé sur le header **'X-User-Id'** pour identifier l'utilisateur.
 Pour certains endpoints, ajoutez ce header (1 étant le user_id du propriétaire du bien, à adapter)
 ```bash
-$ -H "X-User-Id: 1"
+-H "X-User-Id: 1"
 ```  
   
 ### Créer un utilisateur
 ```bash
-$ curl -X POST http://localhost:5000/users \
+curl -X POST http://localhost:5000/users \
 -H "Content-Type: application/json" \
 -d '{    
     "email": "john@example.com",
@@ -126,9 +126,14 @@ $ curl -X POST http://localhost:5000/users \
 }'
 ```
 
+### Rechercher tous les utilisateurs de la plateforme
+```bash
+curl -X GET http://localhost:5000/users
+```
+
 ### Modifier les informations personnelles d'un utilisateur - header **'X-User-Id'** requis
 ```bash
-$ curl -X PATCH http://localhost:5000/users/1 \
+curl -X PATCH http://localhost:5000/users/1 \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
@@ -138,7 +143,7 @@ $ curl -X PATCH http://localhost:5000/users/1 \
 
 ### Créer un bien - header **'X-User-Id'** requis
 ```bash
-$ curl -X POST http://localhost:5000/properties \
+curl -X POST http://localhost:5000/properties \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
@@ -153,13 +158,13 @@ $ curl -X POST http://localhost:5000/properties \
 
 ### Filtrer les biens par ville
 ```bash
-$ curl -X GET http://localhost:5000/properties?city=Clichy
+curl -X GET http://localhost:5000/properties?city=Clichy
 ```
 
 ### Ajouter une pièce à un bien - header **'X-User-Id'** requis
 #### 1 étant l'id du bien (à adapter)  
 ```bash
-$ curl -X POST http://localhost:5000/properties/1/rooms \
+curl -X POST http://localhost:5000/properties/1/rooms \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{

@@ -20,24 +20,11 @@ Un propriétaire ne puisse modifier que les caractéristiques de son bien sans a
 
 
 ## Solution:
-### Breadboard:
-  1. `[User]` -> Créer un compte (`POST /users`)
-  2. `[User]` -> Se connecter (`POST /users/login`)
-  3. `[User]` -> Créer un bien (`POST /properties`)
-  4. `[User]` -> Ajouter des pièces à un bien (`POST /properties/{property_id}/rooms`)
-  5. `[User]` -> Afficher les biens (GET /properties?city=Paris)
-  6. `[Owner]` -> Modifier seulement ses propres biens (ownership check → 403 si violation)  
-
 ### Fat marker sketch:
-    - Flask REST API
-      - `/users` -> auth + CRUD
-      - `/properties` -> CRUD + filter
-      - `/rooms` -> CRUD nested  
+![Fat Marker](/assets/fatmarker.png)
 
-    - Base de données: PostgreSQL
-      - users (1)
-      - properties (N)
-      - rooms (N)
+### Breadboard:
+![Breadboard](/assets/breadboard.png)
 
 ### Fonctionnalités détaillées:
   - User management (must-have):  
@@ -99,7 +86,6 @@ Un propriétaire ne puisse modifier que les caractéristiques de son bien sans a
 
 ### Nice-to-have:
 - Scope 7 : ownership control (1j)
-- Scope 8 : tests unitaires (0.5j)
 
 
 ## Done means:
@@ -110,7 +96,7 @@ Un propriétaire ne puisse modifier que les caractéristiques de son bien sans a
 5. Un utilisateur peut renseigner / modifier ses infos personnelles,
 6. GET /properties?city=Paris retourne uniquement les biens parisiens,
 7. Un utilisateur ne peut pas modifier le bien d'un autre utilisateur (403 Forbiden),
-8. l'API retourne des erreurs HTTP appropriées (400, 404, 403, 500)
+8. l'API retourne des erreurs HTTP appropriées
 9. Le README permet de lancer le projet en 5 minutes
 
 
@@ -118,6 +104,5 @@ Un propriétaire ne puisse modifier que les caractéristiques de son bien sans a
 - **Langage**: Python (requis)
 - **Framework**: Flask (requis, adapté aux APIs REST),
 - **Base de données**: PostreSQL (Relationnel),
-- **Eventuel ORM**: SQLAlchemy (standard python, puissant pour les relations),
-- **Tests**: Pytest (standard python pour tests unitaires),
+- **ORM**: SQLAlchemy (standard python, puissant pour les relations),
 - **Auth**: Header custom (simple pour un MVP, evolutif vers JWT)
