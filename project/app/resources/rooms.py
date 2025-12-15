@@ -29,7 +29,7 @@ class RoomResource(Resource):
 
         property = Property.query.get(room.property_id)
         if not property:
-            return {'error': f'Property {property_id} not found'}, 404
+            return {'error': f'Property {room.property_id} not found'}, 404
 
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403
@@ -59,7 +59,7 @@ class RoomResource(Resource):
 
         property = Property.query.get(room.property_id)
         if not property:
-            return {'error': f'Property {property_id} not found'}, 404
+            return {'error': f'Property {room.property_id} not found'}, 404
 
         if property.owner_id != user_id:
             return {'error': 'Forbidden'}, 403

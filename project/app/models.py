@@ -15,7 +15,6 @@ class User(db.Model):
     birth_date = db.Column(db.Date, nullable=False)
     created_at = db.Column(db.DateTime, default=func.now())
 
-    # lazy = true ne charge pas automatiquement les biens qui sont liées au user quand on fait une requete
     properties = relationship("Property", back_populates="owner", lazy=True)
 
 

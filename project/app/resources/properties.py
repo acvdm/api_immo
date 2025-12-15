@@ -14,7 +14,6 @@ from app.common.auth import get_current_user_id
 class PropertiesListResource(Resource):
     def get(self):
         city = request.args.get("city", None, type=str)
-        print("city param:", repr(city))
         query = Property.query
 
         if city:
