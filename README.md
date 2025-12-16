@@ -23,7 +23,7 @@ docker compose version
 ##### Linux (Ubuntu/Debian)
 ```bash
 # Installer Docker
-udo apt-get update
+sudo apt-get update
 sudo apt-get install docker.io docker-compose-plugin
 
 # Ajouter votre utilisateur au groupe docker
@@ -116,7 +116,7 @@ Pour certains endpoints, ajoutez ce header (1 étant le user_id du propriétaire
   
 ### Créer un utilisateur
 ```bash
-curl -X POST http://localhost:5000/users \
+curl -i -X POST http://localhost:5000/users \
 -H "Content-Type: application/json" \
 -d '{    
     "email": "john@example.com",
@@ -128,12 +128,12 @@ curl -X POST http://localhost:5000/users \
 
 ### Rechercher tous les utilisateurs de la plateforme
 ```bash
-curl -X GET http://localhost:5000/users
+curl -i -X GET http://localhost:5000/users
 ```
 
 ### Modifier les informations personnelles d'un utilisateur - header **'X-User-Id'** requis
 ```bash
-curl -X PATCH http://localhost:5000/users/1 \
+curl -i -X PATCH http://localhost:5000/users/1 \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
@@ -143,7 +143,7 @@ curl -X PATCH http://localhost:5000/users/1 \
 
 ### Créer un bien - header **'X-User-Id'** requis
 ```bash
-curl -X POST http://localhost:5000/properties \
+curl -i -X POST http://localhost:5000/properties \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
@@ -158,13 +158,13 @@ curl -X POST http://localhost:5000/properties \
 
 ### Filtrer les biens par ville
 ```bash
-curl -X GET http://localhost:5000/properties?city=Clichy
+curl -i -X GET http://localhost:5000/properties?city=Clichy
 ```
 
 ### Ajouter une pièce à un bien - header **'X-User-Id'** requis
 #### 1 étant l'id du bien (à adapter)  
 ```bash
-curl -X POST http://localhost:5000/properties/1/rooms \
+curl -i -X POST http://localhost:5000/properties/1/rooms \
 -H "Content-Type: application/json" \
 -H "X-User-Id: 1" \
 -d '{
